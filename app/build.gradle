@@ -1,0 +1,122 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = "com.aol.obi"
+archivesBaseName = "android-tokenization-stech-lib"
+version = "1.0-SNAPSHOT"
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.01"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+build {
+    doFirst {
+        copy {
+            from('README.md')
+            into('build/intermediates/classes/release/META-INF/')
+        }
+    }
+}
+
+task makeJar(type: Jar) {
+    from('build/intermediates/classes/release/')
+  //  archiveName 'tokenization-with-kount.jar'
+}
+
+
+task clearJar(type: Delete) {
+    delete 'build/libs/*.jar'
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+makeJar.dependsOn(clearJar)
+
+task javadoc(type: Javadoc) {
+    failOnError false
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.compile
+}
+
+// build a jar with javadoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+
+    include("**/*.java")
+}
+
+artifacts {
+    archives makeJar, javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'OBI Tokenization Library with safetech'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'This library can be used to tokenize sensitive information. also supports saftech'
+                url 'https://github.com/aol/obi_android_tokenization_stech_lib'
+
+                scm {
+                    connection 'scm:git@github.com:aol/obi_android_tokenization_stech_lib.git'
+                    developerConnection 'scm:git@github.com:aol/obi_android_tokenization_stech_lib.git'
+                    url 'https://github.com/aol/obi_android_tokenization_stech_lib'
+                }
+
+                licenses {
+                    license {
+                        name 'Private / Commercial'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'jagadeeshaluri00'
+                        name 'Jagadeesh Aluri'
+                        email 'Jagadeesh.Aluri@teamaol.com'
+                    }
+                }
+            }
+        }
+    }
+}
