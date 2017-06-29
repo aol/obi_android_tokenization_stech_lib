@@ -9,32 +9,17 @@
 
 HOW TO USE
 
-1. Add tokenization-with-kount.aar file into libs folder of your Android project.
 
-2. Add
-
-allprojects {
-    repositories {
-        jcenter()
-        flatDir {
-            dirs 'libs'
-        }
-    }
-}
-
-into app level build.gradle file
-
-3. Add
-
-compile(name:'tokenization-with-kount', ext:'aar')
+1. Add
+compile 'com.aol.obi:android-tokenization-stech-lib-lib:1.0'
 
 under dependencies of app level build.gradle file
 
-4. Sync project
+2. Sync project
 
-5. Add permission request for ACCESS_FINE_LOCATION for Android API >= 23
+3. Add permission request for ACCESS_FINE_LOCATION for Android API >= 23
 
-6. Use the following code to
+4. Use the following code to
   a) encrypt and tokenize a credit card number and cvv using Safetech:
     Tokenize tokenize = new Tokenize(context);
     String encryptedCreditCard = tokenize.creditCard(cardNumber, cardCvv, domain, merchantId);
