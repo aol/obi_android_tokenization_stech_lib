@@ -20,7 +20,7 @@ under dependencies of app level build.gradle file
 
 4. Use the following code
 
-  a) to validate, encrypt and tokenize a credit card number and cvv using Kount:
+  a) to validate, encrypt and tokenize a credit card number and cvv using library:
 
      Tokenize tokenize = new Tokenize(context);
      String encryptedCreditCard = tokenize.creditCard(cardNumber, cardCvv, domain, merchantId);
