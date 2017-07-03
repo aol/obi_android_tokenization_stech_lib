@@ -33,20 +33,21 @@ import java.util.concurrent.ExecutionException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class EncryptCard {
+public class Encrypt {
 
 /*
  *
  * Use the following code to encrypt and tokenize a credit card number and cvv.
  *
- * String encryptedCardToken = EncryptCard.encryptCard(cardNumber, cardCvv, domain);
+ * String encryptedCard = Encrypt.encrypt(cardNumber, cardCvv, domain);
+ * String encryptedBankAccount = Encrypt.encrypt(accountNumber, "", domain);
  *
  * domain shows the environment of the library usage and can be "DEV" or "PROD" or "QA".
  * Any other value of domain will be considered as "QA".
  *
  */
 
-    public static String encryptCard(String cardNumber, String cardCvv, String domain) {
+    public static String encrypt(String cardNumber, String cardCvv, String domain) {
 
         String reqToken = String.valueOf( UUID.randomUUID()).replace("-", "");
 
@@ -55,7 +56,7 @@ public class EncryptCard {
         cardNumber = cardNumber.replace(".", "");
 
         String cardNumberWithCvv = cardNumber + ";" + cardCvv;
-        String encodedCardNumber = EncryptCard.encrypt(cardNumberWithCvv, reqToken);
+        String encodedCardNumber = Encrypt.encrypt(cardNumberWithCvv, reqToken);
 
         TokenizePaymentMethod tokenizePaymentMethod = new TokenizePaymentMethod();
 

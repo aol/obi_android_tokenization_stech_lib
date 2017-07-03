@@ -34,9 +34,12 @@ build {
 
 task makeJar(type: Jar) {
     from('build/intermediates/classes/release/')
-  //  archiveName 'tokenization-with-kount.jar'
+//    archiveName 'tokenization-with-kount.jar'
 }
 
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
 
 task clearJar(type: Delete) {
     delete 'build/libs/*.jar'

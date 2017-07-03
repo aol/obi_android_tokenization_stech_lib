@@ -23,10 +23,14 @@ public class Tokenize {
     }
 
     public String creditCard(String cardNumber, String cardCvv, String domain, int merchantId) {
+
+        if (!Validator.validate(cardNumber)){
+            Toast.makeText(ctx, "Credit card number is not valid", Toast.LENGTH_SHORT).show();
+            return "";
+        }
+
         String sessionId = String.valueOf(UUID.randomUUID()).replace("-", "");
-
         setupDataCollector(sessionId, domain, merchantId);
-
         return setupEncryption("card", cardNumber, cardCvv, sessionId, domain);
     }
 
@@ -79,7 +83,7 @@ public class Tokenize {
             cardType = "CHECKING";
         }
 
-        String encryptedCardToken = EncryptCard.encryptCard(number, cvv, domain);
+        String encryptedCardToken = Encrypt.encrypt(number, cvv, domain);
         String fullResult = encryptedCardToken + ";" + sessionId + ";" + cardType;
 
         String encodedFullResult = "";
@@ -100,10 +104,7 @@ public class Tokenize {
         if (cardNumber.length() > 2) {
             if (cardNumber.startsWith("4")) {
                 cardType = "VISA";
-            } else if((Short.valueOf(cardNumber.substring(0, 2))>=51 && Short.valueOf(cardNumber.substring(0, 2))<=55) ||
-                    (Short.valueOf(cardNumber.substring(0, 4))>=2221 && Short.valueOf(cardNumber.substring(0, 4))<=2720)){
-                cardType = "MASTER_CARD";
-            }else if ( cardNumber.startsWith("34") || cardNumber.startsWith("37") ) {
+            } else if ( cardNumber.startsWith("34") || cardNumber.startsWith("37") ) {
                 cardType = "AMERICAN_EXPRESS";
             } else if ( (Integer.parseInt(cardNumber.substring(0, 3)) > 299 &&
                     Integer.parseInt(cardNumber.substring(0, 3)) < 306 ) ||
@@ -114,6 +115,8 @@ public class Tokenize {
             } else if ( cardNumber.startsWith("1800") || cardNumber.startsWith("2131") ||
                     cardNumber.startsWith("35")) {
                 cardType = "JCB";
+            } else {
+                cardType = "MASTER_CARD";
             }
         }
 
