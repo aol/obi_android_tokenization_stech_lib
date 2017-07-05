@@ -1,4 +1,4 @@
-package com.aol.obi.android.lib.kount;
+package com.aol.obi.android.lib;
 
 public class Validator {
 
