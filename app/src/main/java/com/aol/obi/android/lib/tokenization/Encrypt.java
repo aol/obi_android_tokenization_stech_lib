@@ -1,7 +1,7 @@
 /*
  * AMERICA ONLINE CONFIDENTIAL INFORMATION
  *
- * Copyright (c) 2016. AOL Inc
+ * Copyright (c) 2017. AOL Inc
  * All Rights Reserved.  Unauthorized reproduction, transmission, or
  * distribution of this software is a violation of applicable laws.
  *
@@ -10,7 +10,7 @@
  *
  */
 
-package com.aol.obi.android.lib;
+package com.aol.obi.android.lib.tokenization;
 
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -35,19 +35,26 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class Encrypt {
 
-/*
- *
- * Use the following code to encrypt and tokenize a credit card number and cvv.
- *
- * String encryptedCard = Encrypt.encrypt(cardNumber, cardCvv, domain);
- * String encryptedBankAccount = Encrypt.encrypt(accountNumber, "", domain);
- *
- * domain shows the environment of the library usage and can be "DEV" or "PROD" or "QA".
- * Any other value of domain will be considered as "QA".
- *
- */
+    /**
+     *
+     * Usage:
+     *
+     * String encryptedCard = Encrypt.encrypt(cardNumber, cardCvv, domain);
+     *
+     * or
+     *
+     * String encryptedBankAccount = Encrypt.encrypt(accountNumber, "", domain);
+     *
+     *
+     * @param cardNumber - String value of credit card number. Can be with spaces, with dashes, with dots or without.
+     * @param cardCvv - String value of credit card cvv or empty string in case of bank account.
+     * @param domain - String showing the environment of the library usage and can be "DEV" or "PROD" or "QA".
+     *                 Any other value of domain will be considered as "QA".
+     * @return - Returns encrypted data string.
+     * @throws OBISystemException - Throws OBISystemException if system error occured. user need to retry.
+     */
 
-    public static String encrypt(String cardNumber, String cardCvv, String domain) {
+    public static String encrypt(String cardNumber, String cardCvv, String domain) throws OBISystemException {
 
         String reqToken = String.valueOf( UUID.randomUUID()).replace("-", "");
 
@@ -95,10 +102,11 @@ public class Encrypt {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    throw new OBISystemException("System exception. please retry");
                 }
             }
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            throw new OBISystemException("System exception. please retry");
         }
 
         return "";

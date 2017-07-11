@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "com.aol.obi"
 archivesBaseName = "android-tokenization-stech-lib"
-version = "1.0-SNAPSHOT"
+version = "1.2'
 
 android {
     compileSdkVersion 25
@@ -34,7 +34,6 @@ build {
 
 task makeJar(type: Jar) {
     from('build/intermediates/classes/release/')
-//    archiveName 'tokenization-with-kount.jar'
 }
 
 dependencies {

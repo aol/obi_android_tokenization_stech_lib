@@ -1,11 +1,10 @@
-package com.aol.obi.android.lib;
+package com.aol.obi.android.lib.tokenization;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.kount.api.DataCollector;
 
@@ -22,24 +21,57 @@ public class Tokenize {
         this.ctx = ctx;
     }
 
-    public String creditCard(String cardNumber, String cardCvv, String domain, int merchantId) {
+    /**
+     *
+     * Usage:
+     *
+     * Tokenize tokenize = new Tokenize(context);
+     * String encryptedCreditCard = tokenize.creditCard(cardNumber, cardCvv, domain, merchantId);
+     *
+     *
+     * @param cardNumber - String value of credit card number. Can be with spaces, with dashes, with dots or without.
+     * @param cardCvv - String value of credit card cvv.
+     * @param domain - String showing the environment of the library usage and can be "DEV" or "PROD" or "QA".
+     *                 Any other value of domain will be considered as "QA".
+     * @param merchantId - Integer value of your valid merchant ID.
+     * @return - Returns encrypted data string.
+     * @throws OBIValidationException - Throws OBIValidationException if credit card number is invalid.
+     * @throws OBISystemException - Throws OBISystemException if system error occurred. user need to retry.
+     */
+
+    public String creditCard(String cardNumber, String cardCvv, String domain, int merchantId) throws OBIValidationException, OBISystemException {
 
         if (!Validator.validate(cardNumber)){
-            Toast.makeText(ctx, "Credit card number is not valid", Toast.LENGTH_SHORT).show();
-            return "";
+            throw new OBIValidationException("Credit card number is not valid.");
+        } else {
+            String sessionId = String.valueOf(UUID.randomUUID()).replace("-", "");
+            setupDataCollector(sessionId, domain, merchantId);
+            return setupEncryption("card", cardNumber, cardCvv, sessionId, domain);
         }
-
-        String sessionId = String.valueOf(UUID.randomUUID()).replace("-", "");
-        setupDataCollector(sessionId, domain, merchantId);
-        return setupEncryption("card", cardNumber, cardCvv, sessionId, domain);
     }
 
-    public String bankAccount(String cardNumber, String domain, int merchantId) {
+    /**
+     *
+     * Usage:
+     *
+     * Tokenize tokenize = new Tokenize(context);
+     * String encryptedBankAccount = tokenize.bankAccount(accountNumber, domain, merchantId);
+     *
+     *
+     * @param accountNumber - String value of bank account number. Can be with spaces, with dashes, with dots or without.
+     * @param domain - String showing the environment of the library usage and can be "DEV" or "PROD" or "QA".
+     *                 Any other value of domain will be considered as "QA".
+     * @param merchantId - Integer value of your valid merchant ID.
+     * @return - Returns encrypted data string.
+     * @throws OBISystemException - Throws OBISystemException if system error occurred. user need to retry.
+     */
+
+    public String bankAccount(String accountNumber, String domain, int merchantId) throws OBISystemException {
         String sessionId = String.valueOf(UUID.randomUUID()).replace("-", "");
 
         setupDataCollector(sessionId, domain, merchantId);
 
-        return setupEncryption("bank", cardNumber, "", sessionId, domain);
+        return setupEncryption("bank", accountNumber, "", sessionId, domain);
     }
 
     private void setupDataCollector(final String sessionId, String domain, int merchantId) {
@@ -55,25 +87,28 @@ public class Tokenize {
             DataCollector.getInstance().setEnvironment(DataCollector.ENVIRONMENT_TEST);
         }
 
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable()  {
             public void run() {
                 DataCollector.getInstance().collectForSession(sessionId, new DataCollector.CompletionHandler() {
                     @Override
                     public void completed(String sessionID) {
                         Log.i(LOG_TAG, "Data collection completed.");
-                        Toast.makeText(ctx, "Data collection completed.", Toast.LENGTH_SHORT).show();
                     }
                     @Override
                     public void failed(String sessionID, final DataCollector.Error error) {
-                        Log.e(LOG_TAG, "Data collection failed. " + error.toString());
-                        Toast.makeText(ctx, "Data collection failed. " + error.toString(), Toast.LENGTH_SHORT).show();
+                        try {
+                            throw new OBISystemException(
+                                    "Data collection failed for sessionID " + sessionID + " with the following error: " + error.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
         });
     }
 
-    private String setupEncryption(String accountType, String number, String cvv, String sessionId, String domain) {
+    private String setupEncryption(String accountType, String number, String cvv, String sessionId, String domain) throws OBISystemException {
 
         String cardType = "";
 

@@ -1,4 +1,4 @@
-package com.aol.obi.android.lib;
+package com.aol.obi.android.lib.tokenization;
 
 public class Validator {
 
@@ -89,6 +89,17 @@ public class Validator {
         }
         return applyAlgorithm && validate(creditCard);
     }
+
+    /**
+     *
+     * Usage:
+     *
+     * boolean isValid = Validator.validate(cardNumber);
+     *
+     *
+     * @param cardNumber - String value of credit card number. Can be with spaces, with dashes, with dots or without.
+     * @return - true or false
+     */
 
     public static boolean validate(String cardNumber) {
         cardNumber = cardNumber.replace("-", "");
