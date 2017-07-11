@@ -41,6 +41,12 @@ under dependencies of app level build.gradle file
   e) to validate a credit card
 
      boolean isValid = Validator.validate(cardNumber);
+     
+  f) Exceptions: 
+
+     OBIValidationException -> Throws this exception when invalid card passed. User need to correct the input
+     OBISystemException -> Throws this exception incase of unknown system errors, user can retry.
+  
 
 ___________
 Notes:
